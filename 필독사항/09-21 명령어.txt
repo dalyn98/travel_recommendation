@@ -1,0 +1,31 @@
+conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+-> 무조건!!!!!!!!!!!!!!!! 해당 버전으로 설치하기 무조건 무조건
+
+systemctl 사용이 안됨에 따라 service 실행 명령어가 변경
+ex : sudo systemctl start docker
+-> sudo service docker start
+
+도커파일 빌드(도커파일 경로는 ~/임)
+docker build -t airflow_test_0.2 . (.까지)
+-> docker build -t [Image name]
+
+-d : background 실행
+-it : 터미널 <> 컨테이너 입력 용이하게 설정
+--gpus all : 가용 가능한 gpu 모두 사용
+-p : 80-90:80-90 : port 80~90까지 오픈
+-v : 터미널과 컨테이너의 공유 디렉토리임, 필수적으로 만들고, 모든 작업들을 해당 디렉토리에서 처리해야함 ****
+docker run -d -it --gpus all -p 80-90:80-90 --name 0.2 -v /home/hyunwoo/workspace2:/workspace2/ airflow_test_0.2 bash
+docker run -d -it --gpus all -p [port-port:port-port] --name [container name] -v [path:path] [Image name] bash
+
+도커 '컨테이너' 시작
+docker start [continaer name]
+
+컨테이너 '접속'
+docker exec -it 0.2 /bin/bash (위의 예에서)
+-> docker exec -it [container names] /bin/bash
+
+도커 이미지 저장(commit) https://nicewoong.github.io/development/2018/03/06/docker-commit-container/ 참고
+
+ipynb to py
+jupyter nbconvert --to script filename.ipynb
+CLI 환경이다보니 코드 작성에 조금 귀찮을수 있음, jupyter후, jupyter에서 따로 터미널 생성하여 작업하면 편리함 

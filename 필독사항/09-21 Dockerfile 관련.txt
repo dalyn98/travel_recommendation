@@ -1,0 +1,45 @@
+우분투 20.04 환경에서 실행했었을때, 여러가지 오류가 많아 해당 오류들을 처리한 상태의 Dockerfile임
+
+알수도 있겠으나 혹시 몰라 정리해놓음
+
+Dockerfile은 하나의 이미지를 Base로 하여, 
+해당 이미지를 Build할때 일련의 처리를 한번해 할수 있게 정의하는 파일임
+
+FROM : BaseImage
+ENV : 환경변수
+USER : User
+RUN : Bash Script 실행
+
+EXPOSE : port 활성화
+
+FROM pytorch/pytorch:latest # pytorch,gpu 사용을 위해 pytorch에서 릴리즈한 이미지 사용
+
+ENV DEBIAN_FRONTEND=noninteractive # 작성하지 않을경우 오류발생
+
+USER root # root사용자
+
+RUN apt-get update -y && apt-get install -y tzdata 
+# airflow의 경우 UTC 시간대를 사용하나, 해당 라이브러리가 없을경우 UTC 시간대 사용이 불가능하여 오류 뱉음
+RUN apt-get install -y python3.9.13
+# 우리집 gpu cuda 버전이 3.9.13에 맞춰져있음, 변경하지말길 ㅠㅠ
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9.13
+# python 설치후 docker 내에서의 기본 python 버전 변경
+RUN conda update -y conda && conda install -y airflow 
+# airflow 설치
+
+RUN airflow db init
+# airflow 데이터베이스 초기화
+
+RUN echo 'export AIRFLOW_HOME=~/airflow' >> /home/jovyan/.profile
+RUN echo 'export AIRFLOW_HOME=~/airflow' >> /home/jovyan/.bashrc
+# AIRFLOW_HOME이라는 환경변수 생성, 필수적임
+RUN source ~/.profile
+# 환경변수 update
+
+RUN mkdir $AIRFLOW_HOME/dags # -> 해당 부분 오류로 인해 실행이 되지 않음
+# 직접 만들어줘야 하며, *만든 dags들은 모두 이 경로에 들어가야함*
+
+RUN airflow users create --username admin --firstname KIM --lastname hyunwoo --role Admin --password admin --email dalyn8690@gmail.com
+# -> airflow를 web에서 gui로 볼시 필요한 계정, admin/admin
+
+EXPOSE 80
