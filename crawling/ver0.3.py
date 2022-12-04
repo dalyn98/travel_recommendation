@@ -51,7 +51,7 @@ def result_stat(args, travel):
 
 
 def data2frame(args, total_list):
-    df = pd.read_csv(args.data_path).drop('Unnamed: 0', axis=1).iloc[:3]
+    df = pd.read_csv(args.data_path).drop('Unnamed: 0', axis=1)
     # temp_df = df['관광지명'].to_frame()
     # temp_df['검색결과'] = result_list
     df['검색건수']=total_list['검색건수']
